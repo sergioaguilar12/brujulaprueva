@@ -1,0 +1,181 @@
+<!-DOCTYPE HTML-->
+<html>
+<head>
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    
+<link rel="stylesheet" href="css/jquery.mobile-1.4.5.css" type="text/css"/>
+<link rel="stylesheet" href="css/jquery.mobile.theme-1.4.5.min.css" type="text/css"  />
+<link rel="stylesheet" href="css/jquery.mobile.structure-1.4.5.min.css" type="text/css" />
+
+<script type="text/javascript" src="phonegap.js"></script>
+<script type="text/javascript" src="js/jquery-2.2.0.min.js" ></script>
+<script type="text/javascript" src="js/jquery.mobile-1.4.5.min.js" ></script>
+<script src="jquery.mobile-1.4.0/jquery.mobile-1.4.0.min.js" type="text/javascript"></script>
+
+        <script type="text/javascript" src="js/jquery.js"></script>
+        <link href="css/estilos.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript">
+    
+    document.addEventListener("deviceready", onDeviceReady, false);
+
+    function onDeviceReady() {
+    console.log(" ****	Dispositivo Listo	**** ");
+	activarLectura();
+}
+    
+    //variables
+            var fecha;
+            var grados;
+            var segundos;
+            var minutos;
+            var horas;
+            var x;
+            var brujula = null;
+            var lecturaActual;
+            
+            $("#acel").bind('pagecreate',function(){
+			
+			
+			$("#obtenerDatos").on('change', function(){
+				if($(this).val() == 'si'){
+					iniciar();
+					}
+					else{
+						detener();
+						}
+				});
+		});
+	
+            $("#acel").on("pagecontainerhide",function(event, ui){
+		detener();
+		});
+            
+            
+            
+            
+            
+            //funcion principal
+            x = $(document);
+            x.ready(reloj);
+            //Funcion del reloj
+            function reloj(){
+                x=$("#digital");
+                fecha = new Date();
+                segundos = fecha.getSeconds();
+                minutos = fecha.getMinutes();
+                horas = fecha.getHours();
+                /*if(segundos == 2){
+                    segundos = "0"+segundos;
+                }*/
+                x.html(horas+":"+minutos+":"+segundos);
+                //meto mis funciones para quese actualizen al segundo
+                seg();
+                min();
+                hour();
+            }
+            // funciones de brujula
+            
+function iniciar() {
+    lecturaActual = navigator.accelerometer.watchAcceleration(exitoAcel,errorAcel,{frequency:3000});
+var opciones = { frequency: 1500 };
+	brujula = navigator.compass.watchHeading(obtenerOrientacion, errorBrujula, opciones);
+}
+
+function detener() {
+        if (lecturaActual){
+			navigator.accelerometer.clearWatch(lecturaActual);
+			lecturaActual = null;
+			}
+	if (brujula) {
+		navigator.compass.clearWatch(brujula);
+		brujula = null;
+	}
+}
+
+function obtenerOrientacion(orientacion){
+	$("#grados").text("Orientación: "+ orientacion.magneticHeading + "°");
+	$("#tiempo").text("Tiempo: "+ orientacion.timestamp);
+	$("#acelX").text("X = " + aceleracion.x);
+	$("#acelY").text("Y = " + aceleracion.y);
+	$("#acelZ").text("Z = " + aceleracion.z);
+        $("#info").text();
+	}
+
+function errorBrujula(error){
+        $("#error").append('<p>error</p>');
+	$("#info").text("Error: "+error.code);
+	}
+            
+            //Funciones de cada aguja
+            function seg(){
+                x=$("#segundero");
+                grados = orientacion.x*1;
+                x.css("-webkit-transform","rotate("+grados+"deg)");
+            }
+            
+            //Definimos el intervalo
+            setInterval(reloj,1000);
+</script>
+
+
+
+
+<style type="text/css">
+#encabezado{
+text-align:center;
+font-size: 14px;
+color:red;
+font-weight:bold;
+}
+#pie{
+
+text-align:center;
+font-size:8px;
+color:green;
+font-weight:bold;
+}
+#global {
+	height: 500px;
+	width: 470px;
+	border: 1px solid #ddd;
+	background: #f1f1f1;
+	overflow-y: scroll;
+}
+img{
+    position: absolute;
+}
+img#segundero, img#minutero, img#hora{
+   -webkit-transition: -webkit-transform 1s;
+}
+</style>
+</head>
+<body>
+    
+    <div data-role="page" id="principal" data-theme="a">
+	<div data-role="header">
+		<h1>Mi Brujula ;) </h1>
+	</div>
+        <div data-role="content">
+            <div id="digital"></div>
+            <div data-inline="true">
+            <label id="grados"></label>
+            <label id="tiempo"></label>
+            <label id="acelX"></label>
+            <label id="acelY"></label>
+            <label id="acelZ"></label>
+            <label id="info"> </label>
+            </div>
+            <div data-inline="true">
+                <button data-inline="true" onClick="iniciar();">Iniciar</button>
+                <button data-inline="true" onClick="detener();">Detener</button>
+            </div>
+        <div id="analogo">
+            <img id="base" src="imagenes/brujula.png"/>
+            <img id="segundero" src="imagenes/aguja.png"/>
+            
+        </div>
+        </div>
+    </div>
+</body>
+</html>
